@@ -262,13 +262,13 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	modelEclipseRearWheels.loadModel("../models/Eclipse/2003eclipse_rear_wheels.obj");
 	modelEclipseRearWheels.setShader(&shaderMulLighting);
 	// Helicopter
-	modelHeliChasis.loadModel("../models/Helicopter/Mi_24_chasis01.obj");
+	modelHeliChasis.loadModel("../models/Helicopter/Mi_24_chasis02.obj");
 	modelHeliChasis.setShader(&shaderMulLighting);
 	modelHeliHeli.loadModel("../models/Helicopter/Mi_24_heli.obj");
 	modelHeliHeli.setShader(&shaderMulLighting);
 
 	//Heli trasera
-	modelHeliTra.loadModel("../models/Helicopter/Mi_24_heli_back.obj");
+	modelHeliTra.loadModel("../models/Helicopter/Mi_24_heli_back_02.obj");
 	modelHeliTra.setShader(&shaderMulLighting);
 	
 	// Lamborginhi
@@ -945,10 +945,9 @@ void applicationLoop() {
 		modelHeliHeli.render(modelMatrixHeliHeli);
 
 		glm::mat4 modelMatrixHeliTra = glm::mat4(modelMatrixHeliChasis);
-		glm::vec3 pivoteHeliTra = glm::vec3(-0.472658f, 2.08777f, -5.6583f);
-		//modelMatrixHeliTra = glm::translate(modelMatrixHeliTra, pivoteHeliTra * -1.0f);
+		glm::vec3 pivoteHeliTra = glm::vec3(0.0f, 2.09782f, -5.64554f);
+		modelMatrixHeliTra = glm::translate(modelMatrixHeliTra, glm::vec3(0.4025f, 2.09782f, -5.64554f));
 		modelMatrixHeliTra = glm::rotate(modelMatrixHeliTra, glm::radians(rotHeliTra), glm::vec3(1.0f, 0.0f, 0.0f));
-		modelMatrixHeliTra = glm::translate(modelMatrixHeliTra, pivoteHeliTra);
 		modelHeliTra.render(modelMatrixHeliTra);
 
 		// Lambo car
