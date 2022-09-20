@@ -91,6 +91,9 @@ Model modelCowboyAnim;
 //Guardian
 Model modelGuardianAnim;
 
+//Practica 2
+Model modelFinnAnim;
+
 GLuint textureCespedID, textureWallID, textureWindowID, textureHighwayID, textureLandingPadID;
 GLuint skyboxTextureID;
 
@@ -127,6 +130,11 @@ glm::mat4 modelMatrixCyborg = glm::mat4(1.0f);
 //20220917
 glm::mat4 modelMatrixGuardian = glm::mat4(1.0f);
 glm::mat4 modelMatrixCowboy = glm::mat4(1.0f);
+
+/*
+* Practica 2
+*/
+glm::mat4 modelMatrixFinn = glm::mat4(1.0f);
 
 float rotDartHead = 0.0, rotDartLeftArm = 0.0, rotDartLeftHand = 0.0, rotDartRightArm = 0.0, rotDartRightHand = 0.0, rotDartLeftLeg = 0.0, rotDartRightLeg = 0.0;
 int modelSelected = 0;
@@ -313,6 +321,10 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	modelCowboyAnim.setShader(&shaderMulLighting);
 	modelGuardianAnim.loadModel("../models/boblampclean/boblampclean.md5mesh");
 	modelGuardianAnim.setShader(&shaderMulLighting);
+
+	//Practica 2
+	modelFinnAnim.loadModel("../models/practica2/Finn/Finn5.fbx");
+	modelFinnAnim.setShader(&shaderMulLighting);
 
 	camera->setPosition(glm::vec3(0.0, 3.0, 4.0));
 
@@ -554,6 +566,11 @@ void destroy() {
 
 	//20220910
 	modelCyborgAnim.destroy();
+	modelCowboyAnim.destroy();
+	modelGuardianAnim.destroy();
+
+	//Practica 2
+	modelFinnAnim.destroy();
 
 	// Textures Delete
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -631,7 +648,7 @@ bool processInput(bool continueApplication) {
 	if (enableCountSelected && glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS){
 		enableCountSelected = false;
 		modelSelected++;
-		if(modelSelected > 2)
+		if(modelSelected > 3)
 			modelSelected = 0;
 		if(modelSelected == 1)
 			fileName = "../animaciones/animation_dart_joints.txt";
@@ -739,6 +756,31 @@ bool processInput(bool continueApplication) {
 		mayowModelAnimate.setAnimationIndex(0);
 	}
 
+	/*
+	* Practica 2
+	* Controles Finn
+	*/
+	if (modelSelected == 3 && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+	{
+		modelMatrixFinn = glm::rotate(modelMatrixFinn, 0.02f, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelFinnAnim.setAnimationIndex(1);
+	}
+	else if (modelSelected == 3 && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+	{
+		modelMatrixFinn = glm::rotate(modelMatrixFinn, -0.02f, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelFinnAnim.setAnimationIndex(1);
+	}
+	else if (modelSelected == 3 && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+	{
+		modelMatrixFinn = glm::translate(modelMatrixFinn, glm::vec3(0.0f, 0.0f, 0.03f));
+		modelFinnAnim.setAnimationIndex(1);
+	}
+	else if (modelSelected == 3 && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+	{
+		modelMatrixFinn = glm::translate(modelMatrixFinn, glm::vec3(0.0f, 0.0f, -0.03f));
+		modelFinnAnim.setAnimationIndex(1);
+	}
+
 	glfwPollEvents();
 	return continueApplication;
 }
@@ -773,7 +815,11 @@ void applicationLoop() {
 	modelMatrixGuardian = glm::rotate(modelMatrixGuardian, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	modelMatrixGuardian = glm::translate(modelMatrixGuardian, glm::vec3(2.0f, 0.0f, 0.0f));
 
-
+	/*
+	* Practica 2
+	*/
+	modelMatrixFinn = glm::translate(modelMatrixFinn, glm::vec3(3.0f, 0.0f, 0.0f));
+	
 	// Variables to interpolation key frames
 	fileName = "../animaciones/animation_dart_joints.txt";
 	keyFramesDartJoints = getKeyRotFrames(fileName);
@@ -1063,6 +1109,15 @@ void applicationLoop() {
 		glm::mat4 modelMatrixGuardianBody = glm::mat4(modelMatrixGuardian);
 		modelMatrixGuardianBody = glm::scale(modelMatrixGuardianBody, glm::vec3(1.0f, 1.0f, 1.0f) * 0.04f);
 		modelGuardianAnim.render(modelMatrixGuardianBody);
+
+		/*
+		* Practica 2
+		*/
+		glm::mat4 modelMatrixFinnBody = glm::mat4(modelMatrixFinn);
+		//modelMatrixFinnBody = glm::translate(modelMatrixFinnBody, glm::vec3(10.0f, 10.0f, 0.0f));
+		modelMatrixFinnBody = glm::scale(modelMatrixFinnBody, glm::vec3(1.0f, 1.0f, 1.0f) * 0.0004f);
+		modelFinnAnim.render(modelMatrixFinnBody);
+		modelFinnAnim.setAnimationIndex(0);
 
 		/*******************************************
 		 * Skybox
