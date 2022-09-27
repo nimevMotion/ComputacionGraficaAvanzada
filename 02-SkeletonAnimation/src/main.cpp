@@ -93,6 +93,7 @@ Model modelGuardianAnim;
 
 //Practica 2
 Model modelFinnAnim;
+Model modelMarioAnim;
 
 GLuint textureCespedID, textureWallID, textureWindowID, textureHighwayID, textureLandingPadID;
 GLuint skyboxTextureID;
@@ -105,12 +106,23 @@ GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
 GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
 GL_TEXTURE_CUBE_MAP_NEGATIVE_Z };
 
-std::string fileNames[6] = { "../Textures/mp_bloodvalley/blood-valley_ft.tga",
-		"../Textures/mp_bloodvalley/blood-valley_bk.tga",
-		"../Textures/mp_bloodvalley/blood-valley_up.tga",
-		"../Textures/mp_bloodvalley/blood-valley_dn.tga",
-		"../Textures/mp_bloodvalley/blood-valley_rt.tga",
-		"../Textures/mp_bloodvalley/blood-valley_lf.tga" };
+//std::string fileNames[6] = { "../Textures/mp_bloodvalley/blood-valley_ft.tga",
+//		"../Textures/mp_bloodvalley/blood-valley_bk.tga",
+//		"../Textures/mp_bloodvalley/blood-valley_up.tga",
+//		"../Textures/mp_bloodvalley/blood-valley_dn.tga",
+//		"../Textures/mp_bloodvalley/blood-valley_rt.tga",
+//		"../Textures/mp_bloodvalley/blood-valley_lf.tga" };
+
+/*
+* Practica 2
+* Skybox
+*/
+std::string fileNames[6] = { "../Textures/Practica2/corona_dn.png",
+					"../Textures/Practica2/corona_ft.png",
+					"../Textures/Practica2/corona_lf.png",
+					"../Textures/Practica2/corona_rt.png",
+					"../Textures/Practica2/corona_up.png",
+					"../Textures/Practica2/corona_bk.png" };
 
 bool exitApp = false;
 int lastMousePosX, offsetX = 0;
@@ -135,6 +147,7 @@ glm::mat4 modelMatrixCowboy = glm::mat4(1.0f);
 * Practica 2
 */
 glm::mat4 modelMatrixFinn = glm::mat4(1.0f);
+glm::mat4 modelMatrixMario = glm::mat4(1.0f);
 
 float rotDartHead = 0.0, rotDartLeftArm = 0.0, rotDartLeftHand = 0.0, rotDartRightArm = 0.0, rotDartRightHand = 0.0, rotDartLeftLeg = 0.0, rotDartRightLeg = 0.0;
 int modelSelected = 0;
@@ -323,8 +336,10 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	modelGuardianAnim.setShader(&shaderMulLighting);
 
 	//Practica 2
-	modelFinnAnim.loadModel("../models/practica2/Finn/Finn5.fbx");
+	modelFinnAnim.loadModel("../models/practica2/Finn/Finn3.fbx");
 	modelFinnAnim.setShader(&shaderMulLighting);
+	//modelMarioAnim.loadModel("../models/practica2/Mario/Luigi2.fbx");
+	//modelMarioAnim.setShader(&shaderMulLighting);
 
 	camera->setPosition(glm::vec3(0.0, 3.0, 4.0));
 
@@ -571,6 +586,7 @@ void destroy() {
 
 	//Practica 2
 	modelFinnAnim.destroy();
+	modelMarioAnim.destroy();
 
 	// Textures Delete
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -819,6 +835,7 @@ void applicationLoop() {
 	* Practica 2
 	*/
 	modelMatrixFinn = glm::translate(modelMatrixFinn, glm::vec3(3.0f, 0.0f, 0.0f));
+	modelMatrixMario = glm::translate(modelMatrixMario, glm::vec3(4.0f, 0.0f, 0.0f));
 	
 	// Variables to interpolation key frames
 	fileName = "../animaciones/animation_dart_joints.txt";
@@ -1118,6 +1135,7 @@ void applicationLoop() {
 		modelMatrixFinnBody = glm::scale(modelMatrixFinnBody, glm::vec3(1.0f, 1.0f, 1.0f) * 0.0004f);
 		modelFinnAnim.render(modelMatrixFinnBody);
 		modelFinnAnim.setAnimationIndex(0);
+		modelMarioAnim.render(modelMatrixMario);
 
 		/*******************************************
 		 * Skybox

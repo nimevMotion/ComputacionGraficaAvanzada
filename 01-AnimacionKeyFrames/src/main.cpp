@@ -47,6 +47,11 @@ Shader shader;
 Shader shaderSkybox;
 //Shader con multiples luces
 Shader shaderMulLighting;
+/*
+* 20220924
+* Shader con varias texturas
+*/
+Shader shaderMultTexture;
 
 std::shared_ptr<FirstPersonCamera> camera(new FirstPersonCamera());
 
@@ -56,6 +61,10 @@ Box boxWalls;
 Box boxHighway;
 Box boxLandingPad;
 
+/*
+* 20220924
+*/
+Box boxMultTexture;
 /*
 * 20220827 
 * Creación de esfera
@@ -121,6 +130,10 @@ Model modelBuzzLeftWing;
 Model modelBuzzLeftWing2;
 
 GLuint textureCespedID, textureWallID, textureWindowID, textureHighwayID, textureLandingPadID;
+/*
+* 20220924
+*/
+GLuint textureSpongeID, textureWaterID;
 GLuint skyboxTextureID;
 
 GLenum types[6] = {
@@ -282,6 +295,11 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	shader.initialize("../Shaders/colorShader.vs", "../Shaders/colorShader.fs");
 	shaderSkybox.initialize("../Shaders/skyBox.vs", "../Shaders/skyBox.fs");
 	shaderMulLighting.initialize("../Shaders/iluminacion_texture_res.vs", "../Shaders/multipleLights.fs");
+	/*
+	* 20220924
+	* 
+	*/
+	shaderMultTexture.initialize("../Shaders/iluminacion_texture_res.vs", "../Shaders/multipleLights_textures.fs");
 
 	// Inicializacion de los objetos.
 	skyboxSphere.init();
@@ -416,6 +434,13 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	modelBuzzLeftWing.setShader(&shaderMulLighting);
 	modelBuzzLeftWing2.setShader(&shaderMulLighting);
 
+	/*
+	* 20220924
+	*/
+	boxMultTexture.init();
+	boxMultTexture.setShader(&shaderMultTexture);
+	boxMultTexture.setPosition(glm::vec3(0.0f, 5.0f, 4.0f));
+	boxMultTexture.setScale(glm::vec3(1.0f, 1.0f, 1.0f) * 2.0f);
 
 	camera->setPosition(glm::vec3(0.0, 3.0, 4.0));
 
@@ -602,6 +627,57 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	}
 
 	textureLandingPad.freeImage(bitmap);
+
+	/*
+	* 20220924
+	* Blending textures
+	*/
+
+	Texture textureSponge("../Textures/sponge.jpg");
+	bitmap = textureSponge.loadImage();
+	data = textureSponge.convertToData(bitmap, imageWidth, imageHeight);
+	glGenTextures(1, &textureSpongeID);
+	glBindTexture(GL_TEXTURE_2D, textureSpongeID);
+	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	if (data)
+	{
+		//tranferir el arreglo data a la tarjeta gráfica
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Fallo al cargar la textura" << " Landing Pad" << std::endl;
+	}
+
+	textureSponge.freeImage(bitmap);
+
+	Texture textureWater("../Textures/water.jpg");	
+	bitmap = textureWater.loadImage();
+	data = textureWater.convertToData(bitmap, imageWidth, imageHeight);
+	glGenTextures(1, &textureWaterID);
+	glBindTexture(GL_TEXTURE_2D, textureWaterID);
+	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	if (data)
+	{
+		//tranferir el arreglo data a la tarjeta gráfica
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Fallo al cargar la textura" << " Landing Pad" << std::endl;
+	}
+
+	textureWater.freeImage(bitmap);
 }
 
 void destroy() {
@@ -623,6 +699,10 @@ void destroy() {
 	boxLandingPad.destroy();
 	//20220827 destruye los objetos renderizados para liberar la memoria
 	esfera.destroy();
+	/*
+	* 20220924
+	*/
+	boxMultTexture.destroy();
 
 	// Custom objects Delete
 	modelAircraft.destroy();
@@ -1149,6 +1229,13 @@ void applicationLoop() {
 					glm::value_ptr(projection));
 		shaderMulLighting.setMatrix4("view", 1, false,
 				glm::value_ptr(view));
+		/*
+		* 20220924
+		*/
+		shaderMultTexture.setMatrix4("projection", 1, false,
+			glm::value_ptr(projection));
+		shaderMultTexture.setMatrix4("view", 1, false,
+			glm::value_ptr(view));
 
 		/*******************************************
 		 * Propiedades Luz direccional
@@ -1158,16 +1245,28 @@ void applicationLoop() {
 		shaderMulLighting.setVectorFloat3("directionalLight.light.diffuse", glm::value_ptr(glm::vec3(0.7, 0.7, 0.7)));
 		shaderMulLighting.setVectorFloat3("directionalLight.light.specular", glm::value_ptr(glm::vec3(0.9, 0.9, 0.9)));
 		shaderMulLighting.setVectorFloat3("directionalLight.direction", glm::value_ptr(glm::vec3(-1.0, 0.0, 0.0)));
+		/*
+		* 20220924
+		*/
+		shaderMultTexture.setVectorFloat3("viewPos", glm::value_ptr(camera->getPosition()));
+		shaderMultTexture.setVectorFloat3("directionalLight.light.ambient", glm::value_ptr(glm::vec3(0.3, 0.3, 0.3)));
+		shaderMultTexture.setVectorFloat3("directionalLight.light.diffuse", glm::value_ptr(glm::vec3(0.7, 0.7, 0.7)));
+		shaderMultTexture.setVectorFloat3("directionalLight.light.specular", glm::value_ptr(glm::vec3(0.9, 0.9, 0.9)));
+		shaderMultTexture.setVectorFloat3("directionalLight.direction", glm::value_ptr(glm::vec3(-1.0, 0.0, 0.0)));
 
 		/*******************************************
 		 * Propiedades SpotLights
 		 *******************************************/
 		shaderMulLighting.setInt("spotLightCount", 0);
+		//20220924
+		shaderMultTexture.setInt("spotLightCount", 0);
 
 		/*******************************************
 		 * Propiedades PointLights
 		 *******************************************/
 		shaderMulLighting.setInt("pointLightCount", 0);
+		//20220924
+		shaderMultTexture.setInt("pointLightCount", 0);
 
 		/*******************************************
 		 * Cesped
@@ -1279,6 +1378,18 @@ void applicationLoop() {
 		boxLandingPad.setScale(glm::vec3(10.0f, 0.05f, 10.0f));
 		boxLandingPad.setPosition(glm::vec3(5.0f, 0.05f, -5.0f));
 		boxLandingPad.render();
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		/*
+		* 20220924
+		*/
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textureWaterID);
+		shaderMultTexture.setInt("texture1", 0);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, textureSpongeID);
+		shaderMultTexture.setInt("texture2", 1);
+		boxMultTexture.render();
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		/*******************************************
