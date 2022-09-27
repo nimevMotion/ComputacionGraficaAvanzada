@@ -336,7 +336,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	modelGuardianAnim.setShader(&shaderMulLighting);
 
 	//Practica 2
-	modelFinnAnim.loadModel("../models/practica2/Finn/Finn3.fbx");
+	modelFinnAnim.loadModel("../models/practica2/Finn/Finn5.fbx");
 	modelFinnAnim.setShader(&shaderMulLighting);
 	//modelMarioAnim.loadModel("../models/practica2/Mario/Luigi2.fbx");
 	//modelMarioAnim.setShader(&shaderMulLighting);
